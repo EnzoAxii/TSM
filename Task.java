@@ -1,9 +1,8 @@
 class Task{
-    private String title;
-    private String desc;
-    private int priority;
-    private String dueDate;
-    private Task subTask;
+    String title;
+    String desc;
+    int priority;
+    String dueDate;
 
     //Constructor
     public Task(String title, String desc, int priority, String dueDate){
@@ -11,6 +10,5 @@ class Task{
         this.desc = desc;
         this.priority = priority;
         this.dueDate = dueDate;
-        subTask = null;
     }
 }

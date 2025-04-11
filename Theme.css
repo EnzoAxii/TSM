@@ -38,11 +38,25 @@
 /* Text area */
 .text-area {
     -fx-text-fill: rgb(255, 255, 255);
-    -fx-border-color: #666666;
     -fx-border-width: 1px;
-    -fx-padding: 5px;
+    -fx-padding: 0px;
 }
 
 .text-area .content {
-    -fx-background-color: #585858;
+    -fx-background-color: #444444;
+    -fx-border-color: #666666;
+}
+
+/*Scroll plane*/
+.scroll-pane .viewport{
+    -fx-background-color: #2b2b2b;
+}
+
+/*Task card*/
+.task-card{
+    -fx-background-color: #2b2b2b;
+    -fx-padding: 15;
+    -fx-border-color: #666666;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
 }

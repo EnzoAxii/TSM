@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+import javafx.geometry.Pos;
 
 public class TaskManagerApp extends Application{
     //The save file for the tasks
@@ -31,13 +32,12 @@ public class TaskManagerApp extends Application{
         }
 
         //Creates the UI button for adding task
-        Button addBtn = new Button("Add Task");
+        Button addBtn = new Button("+");
 
         //Creates the UI buttons for sorting 
         Button sortByPriorBtn = new Button("Sort By Priority");
         Button sortByDateBtn =  new Button("Sort By Date");
         HBox sortBtnBox = new HBox(5, sortByPriorBtn, sortByDateBtn);
-
 
         //Adds task on button press
         addBtn.setOnAction(event -> {
@@ -46,26 +46,61 @@ public class TaskManagerApp extends Application{
 
         //Creates a scroll pane for the tasks in the todo category
         ScrollPane todoPane = new ScrollPane(todoBox);
+        //Fits the scroll pane to the window
         todoPane.setFitToWidth(true);
-        todoPane.setMaxWidth(400);
+        todoPane.setMaxWidth(Double.MAX_VALUE);
 
         //Creates a scroll pane for the tasks in the inProgress category
         ScrollPane inProgressPane = new ScrollPane(inProgressBox);
+        //Fits the scroll pane to the window
         inProgressPane.setFitToWidth(true);
-        inProgressPane.setMaxWidth(400);
+        inProgressPane.setMaxWidth(Double.MAX_VALUE);
 
         //Creates a scroll pane for the tasks in the completed category
         ScrollPane completedPane = new ScrollPane(completedBox);
+        //Fits the scroll pane to the window
         completedPane.setFitToWidth(true);
-        completedPane.setMaxWidth(400);
+        completedPane.setMaxWidth(Double.MAX_VALUE);
 
-        HBox taskBoard = new HBox(10, todoPane, inProgressPane, completedPane);
+        //Labels for the columns
+        Label todoLabel = new Label("To Do");
+        Label inProgressLabel = new Label("In Progress");
+        Label completedLabel = new Label("Completed");
+
+        //Styles the labels for the columns
+        todoLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        inProgressLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        completedLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        
+
+        //Creates HBoxes for the column headers
+        HBox todoHeader = new HBox(todoLabel);
+        HBox inProgressHeader = new HBox(inProgressLabel);
+        HBox completedHeader = new HBox(completedLabel);
+
+        //Centers the column headers
+        todoHeader.setAlignment(Pos.CENTER);
+        inProgressHeader.setAlignment(Pos.CENTER);
+        completedHeader.setAlignment(Pos.CENTER);
+
+        //Creates VBoxes for the columns
+        VBox todoColumn = new VBox(5, todoHeader, todoPane);
+        VBox inProgressColumn = new VBox(5, inProgressHeader, inProgressPane);
+        VBox completedColumn = new VBox(5, completedHeader, completedPane);
+
+        //Fits the columns to the window
+        HBox.setHgrow(todoColumn, Priority.ALWAYS);
+        HBox.setHgrow(inProgressColumn, Priority.ALWAYS);
+        HBox.setHgrow(completedColumn, Priority.ALWAYS);
+
+        //Creates a HBox to contain the columns
+        HBox taskBoard = new HBox(10, todoColumn, inProgressColumn, completedColumn);
 
         //Creates a new VBox object for the layout
         VBox layout =  new VBox(10, sortBtnBox, addBtn, taskBoard);
 
         //Creates a new scene object using the layout
-        Scene scene = new Scene(layout, 400, 500);
+        Scene scene = new Scene(layout, 1200, 600);
 
         //Changes the style of the scene so its not BLINDING
         scene.getStylesheets().add(getClass().getResource("Theme.css").toExternalForm());
@@ -153,47 +188,22 @@ public class TaskManagerApp extends Application{
             //Adds task to list
             taskList.addTask(title, desc, priority, date, status);
 
-            //clear the card
-            card.getChildren().clear();
+            //Removes the editable card
+            VBox parent = (VBox) card.getParent();
+            if(parent != null){
+                parent.getChildren().remove(card);
+            }
 
-            //Locks the data in
-            Label titLabel = new Label(title);
-            Label descLabel = new Label(desc);
-            Label priorLabel = new Label("Priority: " + priority);
-            Label dateLabel = new Label("Due: " + date);
-            Label statusLabel = new Label("Status: " + status);
-
-            //Creates a new button object for the options for the card
-            Button optionsBtn = new Button("\u22EE");
-            //Sets the style of the button
-            optionsBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 25px; -fx-padding: 5; -fx-border-color: transparent;");
-
-            //Creates context menu and its items
-            ContextMenu optionMenu =  new ContextMenu();
-            MenuItem editItem = new MenuItem("Edit");
-            MenuItem deleteItem =  new MenuItem("Delete");
-
-            //adds the menu items to the menu
-            optionMenu.getItems().addAll(editItem,deleteItem);
-
-            //Opens the context menu on button press
-            optionsBtn.setOnAction(e -> {
-                optionMenu.show(optionsBtn, Side.BOTTOM, 0, 0);
-            });
-
-            //handles the creation and format of the top bar of the card
-            HBox topBar = new HBox();
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
-            topBar.getChildren().addAll(spacer, optionsBtn);
-
-            //Adds the labels to the card
-            card.getChildren().addAll(topBar, titLabel, dateLabel, priorLabel, statusLabel, descLabel);
+            //Creates a new VBox for the finalized card
+            VBox lockedCard =  createTaskCardFromSaved(new Task(title, desc, priority, date, status));
+            //Adds the locked card to the column
+            addCardToColumn(lockedCard, status);
         });
 
-        //Adds the fields and button to the card
+        //Adds the fields and button to the card 
         card.getChildren().addAll(titleField, descArea, priorField, datePicker, statusBox, saveBtn);
-        addCardToColumn(card, statusBox.getValue());
+        //displays the editable card in the todo box
+        todoBox.getChildren().add(card);
     }
 
     //Creates task cards from the save file

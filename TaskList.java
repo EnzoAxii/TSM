@@ -10,8 +10,8 @@ class TaskList {
     }
 
     //Adds a task to the list
-    public void addTask(String title, String desc, int priority, String dueDate){
-        taskList.add(new Task(title, desc, priority, dueDate));
+    public void addTask(String title, String desc, int priority, String dueDate, TaskStatus status){
+        taskList.add(new Task(title, desc, priority, dueDate, status));
     }
 
     //Removes a Task from the list based on title

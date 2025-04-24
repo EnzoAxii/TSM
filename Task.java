@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.UUID;
 
 class Task implements Serializable{
     public String title;
@@ -6,6 +7,7 @@ class Task implements Serializable{
     public int priority;
     public String dueDate;
     public TaskStatus status;
+    public String id;
 
     //Constructor
     public Task(String title, String desc, int priority, String dueDate, TaskStatus status){
@@ -14,5 +16,6 @@ class Task implements Serializable{
         this.priority = priority;
         this.dueDate = dueDate;
         this.status = status;
+        this.id = UUID.randomUUID().toString();
     }
 }

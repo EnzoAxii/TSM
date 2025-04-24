@@ -1,4 +1,7 @@
+import java.time.LocalDate;
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
@@ -34,15 +37,32 @@ public class TaskManagerApp extends Application{
         //Creates the UI button for adding task
         Button addBtn = new Button("+");
 
-        //Creates the UI buttons for sorting 
-        Button sortByPriorBtn = new Button("Sort By Priority");
-        Button sortByDateBtn =  new Button("Sort By Date");
-        HBox sortBtnBox = new HBox(5, sortByPriorBtn, sortByDateBtn);
+        //Creates the UI button for sorting 
+        Button sortBtn = new Button("\u21C5 Sort");
+
+        //Creates a context menu for the sorting options
+        ContextMenu sortMenu =  new ContextMenu();
+        MenuItem dateSortItem = new MenuItem("Sort By Date");
+        MenuItem prioritySortItem =  new MenuItem("Sort By Priority");
+        //adds the menu items to the menu
+        sortMenu.getItems().addAll(dateSortItem, prioritySortItem);
+
+        //Opens the sorting menu on button press
+        sortBtn.setOnAction(event -> {
+            if(sortMenu.isShowing()){
+                sortMenu.hide();
+            }
+            sortMenu.show(sortBtn, Side.BOTTOM, 0, 0);
+        });
 
         //Adds task on button press
         addBtn.setOnAction(event -> {
             addTaskCard();
         });
+
+        //Creates a HBox for the top bar of the window
+        HBox topBar = new HBox(5, addBtn, sortBtn);
+        topBar.setPadding(new Insets(5));
 
         //Creates a scroll pane for the tasks in the todo category
         ScrollPane todoPane = new ScrollPane(todoBox);
@@ -71,7 +91,7 @@ public class TaskManagerApp extends Application{
         todoLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
         inProgressLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
         completedLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
-        
+
 
         //Creates HBoxes for the column headers
         HBox todoHeader = new HBox(todoLabel);
@@ -88,6 +108,11 @@ public class TaskManagerApp extends Application{
         VBox inProgressColumn = new VBox(5, inProgressHeader, inProgressPane);
         VBox completedColumn = new VBox(5, completedHeader, completedPane);
 
+        //Styles the columns
+        todoColumn.setStyle("-fx-border-color: #666666; -fx-border-radius: 10; -fx-background-radius: 10;");
+        inProgressColumn.setStyle("-fx-border-color: #666666; -fx-border-radius: 10; -fx-background-radius: 10;");
+        completedColumn.setStyle("-fx-border-color: #666666; -fx-border-radius: 10; -fx-background-radius: 10;");
+
         //Fits the columns to the window
         HBox.setHgrow(todoColumn, Priority.ALWAYS);
         HBox.setHgrow(inProgressColumn, Priority.ALWAYS);
@@ -97,7 +122,7 @@ public class TaskManagerApp extends Application{
         HBox taskBoard = new HBox(10, todoColumn, inProgressColumn, completedColumn);
 
         //Creates a new VBox object for the layout
-        VBox layout =  new VBox(10, sortBtnBox, addBtn, taskBoard);
+        VBox layout =  new VBox(10, topBar, taskBoard);
 
         //Creates a new scene object using the layout
         Scene scene = new Scene(layout, 1200, 600);
@@ -161,7 +186,7 @@ public class TaskManagerApp extends Application{
             TaskStatus status = statusBox.getValue();
 
             //Sets a default value for priority
-            int priority = 0;
+            int priority = 3;
 
             //if status is null then set a default value
             if(status == null) status = TaskStatus.ToDo;
@@ -185,8 +210,9 @@ public class TaskManagerApp extends Application{
                 return;
             }
 
+            Task newTask = new Task(title, desc, priority, date, status);
             //Adds task to list
-            taskList.addTask(title, desc, priority, date, status);
+            taskList.addTask(newTask);
 
             //Removes the editable card
             VBox parent = (VBox) card.getParent();
@@ -196,6 +222,8 @@ public class TaskManagerApp extends Application{
 
             //Creates a new VBox for the finalized card
             VBox lockedCard =  createTaskCardFromSaved(new Task(title, desc, priority, date, status));
+            //attaches the task id to the card
+            lockedCard.setUserData(newTask.id);
             //Adds the locked card to the column
             addCardToColumn(lockedCard, status);
         });
@@ -230,24 +258,124 @@ public class TaskManagerApp extends Application{
         optionsBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 25px; -fx-padding: 5; -fx-border-color: transparent;");
 
         //Creates context menu and its items
-        ContextMenu menu =  new ContextMenu();
+        ContextMenu optionMenu =  new ContextMenu();
         MenuItem editItem = new MenuItem("Edit");
         MenuItem deleteItem =  new MenuItem("Delete");
         //adds the menu items to the menu
-        menu.getItems().addAll(editItem,deleteItem);
+        optionMenu.getItems().addAll(editItem,deleteItem);
 
         //Opens the context menu on button press
         optionsBtn.setOnAction(event -> {
-            menu.show(optionsBtn, Side.BOTTOM, 0, 0);
+            optionMenu.show(optionsBtn, Side.BOTTOM, 0, 0);
         });
 
         //handles the creation and format of the top bar of the card
-        HBox topBar = new HBox();
+        HBox topBarCard = new HBox();
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        topBar.getChildren().addAll(spacer, optionsBtn);
+        topBarCard.getChildren().addAll(spacer, optionsBtn);
 
-        card.getChildren().addAll(topBar, titLabel, dateLabel, priorLabel, statusLabel, descLabel);
+        card.getChildren().addAll(topBarCard, titLabel, dateLabel, priorLabel, statusLabel, descLabel);
+
+        editItem.setOnAction(e -> {
+            //Clear the card
+            card.getChildren().clear();
+
+            //UI for the title section of the task
+            TextField titleField = new TextField(task.title);
+            titleField.setPromptText("Title: ");
+
+            //UI for the description section of the task
+            TextArea descArea = new TextArea(task.desc);
+            descArea.setPromptText("Description: ");
+            descArea.setPrefRowCount(2);
+
+            //UI for the priority section of the task
+            TextField priorField = new TextField(Integer.toString(task.priority));
+            priorField.setPromptText("Priority (1-3): ");
+
+            //UI for the date section of the task
+            DatePicker datePicker = new DatePicker();
+            datePicker.setPromptText("Due Date: ");
+            if(!task.dueDate.equals("No Date")){
+                datePicker.setValue(LocalDate.parse(task.dueDate));
+            }
+
+            //UI for the status combo box
+            ComboBox<TaskStatus> statusBox = new ComboBox<>();
+            statusBox.getItems().addAll(TaskStatus.values());
+            statusBox.setValue(task.status);
+            statusBox.setPromptText("Status");
+
+            Button saveBtn = new Button("Save Task");
+
+            saveBtn.setOnAction(event -> {
+                //Gets the task info, fills with temp date if empty
+                String title = titleField.getText().isEmpty() ? "No Title" : titleField.getText();
+                String desc = descArea.getText().isEmpty() ? "No Desc" : descArea.getText();
+                String priorString = priorField.getText();
+                String date = datePicker.getValue() == null ? "No Date" : datePicker.getValue().toString();
+                TaskStatus status = statusBox.getValue();
+
+                //Sets a default value for priority
+                int priority = 3;
+
+                //if status is null then set a default value
+                if(status == null) status = TaskStatus.ToDo;
+
+                try{
+                    //Checks if the priority string is empty
+                    if (!priorString.isEmpty()) {
+                        //Sets priority to the numbers in piorString
+                        priority = Integer.parseInt(priorString);
+    
+                        //Checks if priority is outside of range
+                        if(priority < 1 || priority > 3){
+                            showAlert("Priority must be a number 1-3");
+                            return;
+                        }
+                    }
+    
+                }
+                catch(NumberFormatException error){
+                    showAlert("Priority must be a number 1-3");
+                    return;
+                }
+
+            //Removes the editable card
+            VBox parent = (VBox) card.getParent();
+            if(parent != null){
+                parent.getChildren().remove(card);
+            }
+
+                //Creates a new VBox for the finalized card
+                VBox updatedCard =  createTaskCardFromSaved(new Task(title, desc, priority, date, status));
+                //Adds the locked card to the column
+                addCardToColumn(updatedCard, status);
+            });
+            //adds the children to the car
+            card.getChildren().addAll(topBarCard,titleField, descArea, priorField, datePicker, statusBox,saveBtn);
+        });
+
+        //removes the card
+        deleteItem.setOnAction(r ->{
+            //gets the task id
+            String taskId = (String) card.getUserData();
+
+            //removes the task from the task list
+            taskList.removeTask(taskId);
+
+            //gets the parent of the card
+            VBox parent = (VBox) card.getParent();
+
+            //checks if the parent is null
+            if(parent != null){
+                //removes the card
+                parent.getChildren().remove(card);
+            }
+        });
+
+        //returns the created card
         return card;
     }
 

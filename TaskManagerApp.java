@@ -60,6 +60,18 @@ public class TaskManagerApp extends Application{
             addTaskCard();
         });
 
+        //Sorts the tasks by priority on button press
+        prioritySortItem.setOnAction(e-> {
+            TaskSorter.sortByPriority(taskList);
+            refreshTasks();
+        });
+
+        //Sorts the tasks by due dates on button press
+        dateSortItem.setOnAction(e-> {
+            TaskSorter.sortByDate(taskList);
+            refreshTasks();
+        });
+
         //Creates a HBox for the top bar of the window
         HBox topBar = new HBox(5, addBtn, sortBtn);
         topBar.setPadding(new Insets(5));
@@ -277,6 +289,9 @@ public class TaskManagerApp extends Application{
 
         card.getChildren().addAll(topBarCard, titLabel, dateLabel, priorLabel, statusLabel, descLabel);
 
+        //Attacht the task id to the card
+        card.setUserData(task.id);
+
         editItem.setOnAction(e -> {
             //Clear the card
             card.getChildren().clear();
@@ -347,13 +362,20 @@ public class TaskManagerApp extends Application{
             if(parent != null){
                 parent.getChildren().remove(card);
             }
-
+                //Update the task with the new info
+                task.title = title;
+                task.desc = desc;
+                task.priority = priority;
+                task.dueDate = date;
+                task.status = status;
                 //Creates a new VBox for the finalized card
                 VBox updatedCard =  createTaskCardFromSaved(new Task(title, desc, priority, date, status));
                 //Adds the locked card to the column
                 addCardToColumn(updatedCard, status);
+                //refresh tasks to keep the right order
+                refreshTasks();
             });
-            //adds the children to the car
+            //adds the children to the card
             card.getChildren().addAll(topBarCard,titleField, descArea, priorField, datePicker, statusBox,saveBtn);
         });
 
@@ -373,6 +395,7 @@ public class TaskManagerApp extends Application{
                 //removes the card
                 parent.getChildren().remove(card);
             }
+
         });
 
         //returns the created card
@@ -404,6 +427,19 @@ public class TaskManagerApp extends Application{
 
         //shows the alert and waits
         alert.showAndWait();
+    }
+
+    //Refresh the tasks
+    private void refreshTasks(){
+        //clear all tasks
+        todoBox.getChildren().clear();
+        inProgressBox.getChildren().clear();
+        completedBox.getChildren().clear();
+
+        //reload the tasks
+        for(Task task : taskList.getTasks()){
+            addCardToColumn(createTaskCardFromSaved(task), task.status);
+        }
     }
 
     public static void main(String[] args) {

@@ -16,6 +16,7 @@ class Task implements Serializable{
         this.priority = priority;
         this.dueDate = dueDate;
         this.status = status;
+        //generates a unique id
         this.id = UUID.randomUUID().toString();
     }
 }

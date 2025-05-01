@@ -101,9 +101,9 @@ public class TaskManagerApp extends Application{
         Label completedLabel = new Label("Completed");
 
         //Styles the labels for the columns
-        todoLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
-        inProgressLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
-        completedLabel.setStyle("-fx-font-size: 25px; -fx-font-weight: bold;");
+        todoLabel.getStyleClass().add("header");
+        inProgressLabel.getStyleClass().add("header");
+        completedLabel.getStyleClass().add("header");
 
 
         //Creates HBoxes for the column headers
@@ -122,9 +122,9 @@ public class TaskManagerApp extends Application{
         VBox completedColumn = new VBox(5, completedHeader, completedPane);
 
         //Styles the columns
-        todoColumn.setStyle("-fx-border-color: #666666; -fx-border-radius: 10; -fx-background-radius: 10;");
-        inProgressColumn.setStyle("-fx-border-color: #666666; -fx-border-radius: 10; -fx-background-radius: 10;");
-        completedColumn.setStyle("-fx-border-color: #666666; -fx-border-radius: 10; -fx-background-radius: 10;");
+        todoColumn.getStyleClass().add("task-column");
+        inProgressColumn.getStyleClass().add("task-column");
+        completedColumn.getStyleClass().add("task-column");
 
         //Fits the columns to the window
         HBox.setHgrow(todoColumn, Priority.ALWAYS);
@@ -268,7 +268,7 @@ public class TaskManagerApp extends Application{
         //Creates a new button object for the options for the card
         Button optionsBtn = new Button("\u22EE");
         //Sets the style of the button
-        optionsBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 25px; -fx-padding: 5; -fx-border-color: transparent;");
+        optionsBtn.setId("card-options-button");
 
         //Creates context menu and its items
         ContextMenu optionMenu =  new ContextMenu();

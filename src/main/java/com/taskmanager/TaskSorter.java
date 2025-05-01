@@ -5,7 +5,7 @@ public class TaskSorter {
     //Sorts the tasks by due date
     public static void sortByDate(TaskList taskList){
         //Sorts the tasklist by due date
-        LinkedList<Task> sorted = mergeSort(taskList.getTasks(), "dueDate");
+        LinkedList<Task> sorted = new LinkedList<>(mergeSort(taskList.getTasks(), "dueDate"));
 
         //Clears the task list
         taskList.getTasks().clear();
@@ -17,7 +17,7 @@ public class TaskSorter {
     //Sorts the tasks by priority
     public static void sortByPriority(TaskList taskList){
         //Sorts the tasklist by priority 
-        LinkedList<Task> sorted = mergeSort(taskList.getTasks(), "priority");
+        LinkedList<Task> sorted = new LinkedList<>(mergeSort(taskList.getTasks(), "priority"));
 
         //Clears the task list
         taskList.getTasks().clear();

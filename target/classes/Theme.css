@@ -1,11 +1,9 @@
-
-/* General background and text color for the stage */
 .root {
     -fx-background-color: #2b2b2b;
     -fx-text-fill: white;
+    -fx-font-family: "Arial";
 }
 
-/* Styling for buttons */
 .button {
     -fx-background-color: #444444;
     -fx-text-fill: white;
@@ -22,13 +20,11 @@
     -fx-border-color: #aaaaaa;
 }
 
-/* Styling for labels */
 .label {
     -fx-text-fill: white;
     -fx-font-size: 14px;
 }
 
-/* Text fields */
 .text-field {
     -fx-background-color: #444444;
     -fx-text-fill: white;
@@ -38,7 +34,6 @@
     -fx-prompt-text-fill: white;
 }
 
-/* Text area */
 .text-area {
     -fx-text-fill: white;
     -fx-border-width: 1px;
@@ -51,7 +46,6 @@
     -fx-border-color: #666666;
 }
 
-/*Scroll plane*/
 .scroll-pane .track{
     -fx-background-color: #4a4a4a;
     -fx-border-color: #4a4a4a;
@@ -74,7 +68,6 @@
     -fx-padding: 0px;
 }
 
-/*Task card*/
 .task-card{
     -fx-background-color: #4a4a4a;
     -fx-padding: 15;
@@ -122,4 +115,27 @@
 
 .combo-box .list-view{
     -fx-background-color:#444444;
+}
+
+.header {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+}
+
+.task-column{
+    -fx-border-color: #666666;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+#card-options-button{
+    -fx-background-color: transparent;
+    -fx-font-size: 25px;
+    -fx-padding: 5;
+    -fx-border-color: transparent;
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-base: #4a4a4a;
+    -fx-mark-highlight-color: -fx-light-text-color ;
 }

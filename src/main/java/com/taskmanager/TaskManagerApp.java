@@ -151,9 +151,6 @@ public class TaskManagerApp extends Application{
 
         //Shows the stage
         primStage.show();
-
-        //Save tasks to save file before closing
-        primStage.setOnCloseRequest(event -> taskList.saveData(SAVE_FILE));
     }
 
     private void addTaskCard(){
@@ -239,6 +236,8 @@ public class TaskManagerApp extends Application{
             lockedCard.setUserData(newTask.id);
             //Adds the locked card to the column
             addCardToColumn(lockedCard, status);
+            //Saves the new task to the save file
+            taskList.saveData(SAVE_FILE);
         });
 
         //Adds the fields and button to the card 
@@ -373,8 +372,10 @@ public class TaskManagerApp extends Application{
                 VBox updatedCard =  createTaskCardFromSaved(new Task(title, desc, priority, date, status));
                 //Adds the locked card to the column
                 addCardToColumn(updatedCard, status);
-                //refresh tasks to keep the right order
+                //refreshs tasks to keep the right order
                 refreshTasks();
+                //saves the updated task to the save file
+                taskList.saveData(SAVE_FILE);
             });
             //adds the children to the card
             card.getChildren().addAll(topBarCard,titleField, descArea, priorField, datePicker, statusBox,saveBtn);

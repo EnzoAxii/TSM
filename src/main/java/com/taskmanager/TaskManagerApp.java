@@ -397,7 +397,8 @@ public class TaskManagerApp extends Application{
                 //removes the card
                 parent.getChildren().remove(card);
             }
-
+            //Saves updated tasklist to the save file
+            taskList.saveData(SAVE_FILE);
         });
 
         //returns the created card
